@@ -14,25 +14,22 @@ def main():
     xl.to_excel('new_xl.xlsx')
     pd.DataFrame()
     print(xl)
-    # syntax_erors
-    # (pylint_stdout, pylint_stderr) = lint.py_run('erors_file.py', return_std=True)
-    # print(pylint_stdout.getvalue())
-    # # print(pylint_stderr.getvalue())
-    # # print('qwe')
-    #
-    # # runtime_erors
-    #
-    # file_from_interface = 'erors_file.py'
-    # program = "python erors_file.py"
-    # with open(file_from_interface) as f:
-    #     try:
-    #         eval(compile(f.read(), '', 'exec'))
-    #     except Exception as e:
-    #         # print(e)*
-    #         # traceback.print_exc(file=sys.stdout)
-    #         exept = traceback.format_exc()
-    #         print(exept)
-    #         # print(traceback.extract_stack())
+
+    #syntax_erors
+    (pylint_stdout, pylint_stderr) = lint.py_run('erors_file.py', return_std=True)
+    print(pylint_stdout.getvalue())
+    # print(pylint_stderr.getvalue())
+    # print('qwe')
+
+    # runtime_erors
+    file_from_interface = 'erors_file.py'
+    program = "python erors_file.py"
+    with open(file_from_interface) as f:
+        try:
+            eval(compile(f.read(), '', 'exec'))
+        except Exception as e:
+            exept = traceback.format_exc()
+            print(exept)
 
     # eval(compile('',filename='erors_file.py',mode='exec'))
 
