@@ -4,7 +4,7 @@ import traceback
 from pylint import epylint as lint
 import sys
 import os
-import datetime
+from datetime import datetime
 import pandas as pd
 
 
@@ -13,19 +13,18 @@ class Tester(object):
         super(Tester, self).__init__()
         self.file = filename
         self.file_path = os.path.join(os.getcwd(), 'user_files', self.file.replace('.py', ''), self.file)
-        self.date = datetime.datetime.now()
+        self.date = datetime.now()
         self.report_file = os.path.join(os.getcwd(), 'user_files', self.file.replace('.py', '')
                                         , 'Report_' + self.file.replace('.py', '.xlsx'))
         self.report_items = {}
         self.pd_frame = self.excel_reader()
-        print(self.report_items)
+        # print(self.report_items)
 
     def excel_reader(self):
         report_pd = pd.read_excel(self.report_file)
         data = {}
         for label, content in report_pd.items():
-            print(label)
-            self.report_items[label] = 1
+            self.report_items[label] = ''
         return report_pd
 
     def excel_writer(self):
@@ -40,13 +39,17 @@ class Tester(object):
             lints = pylint_stdout.getvalue().split('\n')[1:]
             for l in lints:
                 if 'warning' in l:
-                    syntax_err.append(l)
+                    err = l.split(':')
+                    syntax_err.append(f'line({err[2]}) : {err[3]} ')
+                if 'rated' in l:
+                    self.report_items['code_score'] = l.split('(')[0]
                 else:
                     continue
-
-            print(syntax_err)
+            self.report_items['syntax_count'] = str(len(syntax_err))
+            self.report_items['syntax_errors'] = '\n'.join(syntax_err)
+            self.report_items['time'] = self.date.strftime("%d.%m.%Y-%H:%M:%S")
         except:
-            print('Syntax_error')
+            print('Syntax_analyse_error')
 
     def runtime_test(self):
         with open(self.file_path) as f:
@@ -54,15 +57,25 @@ class Tester(object):
                 eval(compile(f.read(), '', 'exec'))
             except:
                 trace = traceback.format_exc()
-                print(trace)
+                up_tarace = []
+                for tr in trace.split('\n'):
+                    if tr != '':
+                        up_tarace.append(tr.replace('  ', ''))
+                up_tarace[3] = up_tarace[3].replace('""', self.file)
+                self.report_items['runtime_errors'] = '\n'.join(up_tarace[3:])
 
     def __del__(self):
-        print("cltkf")
+        for index, value in self.report_items.items():
+            self.report_items[index] = [value]
+            # print(value)
+        self.excel_writer()
+        print(self.report_items)
 
 
 def main():
     test = Tester('erors_file.py')
     test.syntax_test()
+    test.runtime_test()
     del test
     # test.runtime_test()
 
