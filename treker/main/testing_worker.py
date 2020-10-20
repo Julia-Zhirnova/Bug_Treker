@@ -12,9 +12,9 @@ class Tester(object):
     def __init__(self, filename):
         super(Tester, self).__init__()
         self.file = filename
-        self.file_path = os.path.join(os.getcwd(), 'user_files', self.file.replace('.py', ''), self.file)
+        self.file_path = os.path.join(os.getcwd(), '../../user_files', self.file.replace('.py', ''), self.file)
         self.date = datetime.now()
-        self.report_file = os.path.join(os.getcwd(), 'user_files', self.file.replace('.py', '')
+        self.report_file = os.path.join(os.getcwd(), '../../user_files', self.file.replace('.py', '')
                                         , 'Report_' + self.file.replace('.py', '.xlsx'))
         self.report_items = {}
         self.pd_frame = self.excel_reader()
