@@ -6,19 +6,32 @@ import sys
 import os
 from datetime import datetime
 import pandas as pd
+import shutil
 
 
 class Tester(object):
     def __init__(self, filename):
         super(Tester, self).__init__()
         self.file = filename
-        self.file_path = os.path.join(os.getcwd(), '../../user_files', self.file.replace('.py', ''), self.file)
+        self.file_path = os.path.join(os.getcwd(), 'user_files', self.file.replace('.py', ''), self.file)
         self.date = datetime.now()
-        self.report_file = os.path.join(os.getcwd(), '../../user_files', self.file.replace('.py', '')
+        self.report_file = os.path.join(os.getcwd(), 'user_files', self.file.replace('.py', '')
                                         , 'Report_' + self.file.replace('.py', '.xlsx'))
+        self.sample_path = os.path.join(os.getcwd(), 'user_files', 'sample_report.xlsx')
+
+        try:
+            open(os.path.join(os.getcwd(), 'user_files', self.file.replace('.py', ''),
+                                   'Report_' + self.file.replace('.py', '.xlsx')))
+        except:
+            shutil.copy2(self.sample_path,
+                         os.path.join(os.getcwd(), 'user_files', self.file.replace('.py', '')))
+            os.rename(os.path.join(os.getcwd(), 'user_files', self.file.replace('.py', ''), 'sample_report.xlsx'),
+                      os.path.join(os.getcwd(), 'user_files', self.file.replace('.py', ''),
+                                   'Report_' + self.file.replace('.py', '.xlsx')))
+
         self.report_items = {}
         self.pd_frame = self.excel_reader()
-        # print(self.report_items)
+        print(self.report_items)
 
     def excel_reader(self):
         report_pd = pd.read_excel(self.report_file)
@@ -29,7 +42,7 @@ class Tester(object):
 
     def excel_writer(self):
         new_pd = self.pd_frame.append(pd.DataFrame(self.report_items), ignore_index=True)
-        new_pd.to_excel(self.report_file)
+        new_pd.to_excel(self.report_file,index=False)
 
     def syntax_test(self):
         # template = self.file_path+" --msg-template='{category};in-module_{module},line({line}):{msg}' "
