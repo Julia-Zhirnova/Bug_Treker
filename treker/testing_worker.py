@@ -1,8 +1,5 @@
-# import requests
-import subprocess
 import traceback
 from pylint import epylint as lint
-import sys
 import os
 from datetime import datetime
 import pandas as pd
@@ -31,7 +28,6 @@ class Tester(object):
 
         self.report_items = {}
         self.pd_frame = self.excel_reader()
-        print(self.report_items)
 
     def excel_reader(self):
         report_pd = pd.read_excel(self.report_file)
@@ -90,14 +86,6 @@ def main():
     test.syntax_test()
     test.runtime_test()
     del test
-    # test.runtime_test()
-
-    # os.startfile(r"C:\Users\yaroh\OneDrive\Рабочий стол\123.xlsx")
-    # xl=pd.read_excel(r"C:\Users\yaroh\OneDrive\Рабочий стол\123.xlsx", index_col=0)
-    # xl.to_excel('new_xl.xlsx')
-    # pd.DataFrame()
-    # print(xl)
-
 
 if __name__ == '__main__':
     main()
