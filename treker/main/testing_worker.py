@@ -5,12 +5,12 @@ from datetime import datetime
 import pandas as pd
 import shutil
 import subprocess
+from .models import Progs, Syntax, Runtime
 
 
 class Tester(object):
-    def __init__(self, filename):
+    def __init__(self, filename, version, prg_id):
         super(Tester, self).__init__()
-        print(os.getcwd())
         self.file = filename
         self.file_path = os.path.join(os.getcwd(), 'main', 'user_files', self.file.replace('.py', ''), self.file)
         self.date = datetime.now()
@@ -30,7 +30,9 @@ class Tester(object):
                              'Report_' + self.file.replace('.py', '.xlsx')))
 
         self.report_items = {}
+        self.version = version
         self.pd_frame = self.excel_reader()
+        self.prog_id = prg_id
 
     def excel_reader(self):
         report_pd = pd.read_excel(self.report_file)
@@ -60,8 +62,19 @@ class Tester(object):
             self.report_items['syntax_count'] = str(len(syntax_err))
             self.report_items['syntax_errors'] = '\n'.join(syntax_err)
             self.report_items['time'] = self.date.strftime("%d.%m.%Y-%H:%M:%S")
+
+
         except:
             print('Syntax_analyse_error')
+        print(self.report_items['version'])
+        test_s = Syntax(time=self.report_items['time'],
+                        version=self.version,
+                        prog_id=self.prog_id,
+                        err_text=self.report_items['syntax_errors'],
+                        count=self.report_items['syntax_count'],
+                        score=self.report_items['code_score'],
+                        )
+        test_s.save()
 
     def runtime_test(self):
         result = subprocess.run(
@@ -77,7 +90,15 @@ class Tester(object):
             self.report_items['runtime_errors'] = '\n'.join(up_tarace[3:])
         else:
             trace = result.stdout
-            self.report_items['runtime_errors'] = trace
+            self.report_items['run_result'] = trace
+
+        test_r = Runtime(time=self.report_items['time'],
+                        version=self.version,
+                        prog_id=self.prog_id,
+                        err_text=self.report_items['runtime_errors'],
+                        no_err_text=self.report_items['run_result'],
+                        )
+        test_r.save()
 
     def __del__(self):
         for index, value in self.report_items.items():
