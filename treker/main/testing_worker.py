@@ -42,11 +42,11 @@ class Tester(object):
         return report_pd
 
     def excel_writer(self):
+        self.report_items['version'] = self.version
         new_pd = self.pd_frame.append(pd.DataFrame(self.report_items), ignore_index=True)
         new_pd.to_excel(self.report_file, index=False)
 
     def syntax_test(self):
-        # template = self.file_path+" --msg-template='{category};in-module_{module},line({line}):{msg}' "
         try:
             (pylint_stdout, pylint_stderr) = lint.py_run(command_options=self.file_path, return_std=True)
             syntax_err = []
@@ -63,10 +63,8 @@ class Tester(object):
             self.report_items['syntax_errors'] = '\n'.join(syntax_err)
             self.report_items['time'] = self.date.strftime("%d.%m.%Y-%H:%M:%S")
 
-
         except:
             print('Syntax_analyse_error')
-        print(self.report_items['version'])
         test_s = Syntax(time=self.report_items['time'],
                         version=self.version,
                         prog_id=self.prog_id,
@@ -93,11 +91,11 @@ class Tester(object):
             self.report_items['run_result'] = trace
 
         test_r = Runtime(time=self.report_items['time'],
-                        version=self.version,
-                        prog_id=self.prog_id,
-                        err_text=self.report_items['runtime_errors'],
-                        no_err_text=self.report_items['run_result'],
-                        )
+                         version=self.version,
+                         prog_id=self.prog_id,
+                         err_text=self.report_items['runtime_errors'],
+                         no_err_text=self.report_items['run_result'],
+                         )
         test_r.save()
 
     def __del__(self):

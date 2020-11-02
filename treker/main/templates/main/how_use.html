@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+{% include "./header.html" %}
+<div class="container-fluid">
+    <div class="row">
+        {% include "./patern.html" %}
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+            <h1 class="mt-5">How to use our bug trecker</h1>
+            <ol>
+                <li><p>To get started, you need to upload at least one .py file (click upload new file)</p></li>
+                <li><p>The file you uploaded will immediately appear in the left menu.</p>
+                    <p>-- Pay attention,
+                        when you load an existing file, its contents are overwritten, and its version is increased by 1
+                    </p>
+                </li>
+                <li><p>Now you have the opportunity to go to this file to conduct tests</p></li>
+                <li><p>On the tests page, you will find information about the file, such as: name, version, tests
+                    performed
+                    and errors in them</p>
+                </li>
+                <li><p>Also, inside one test, you can view information about various errors by clicking the
+                    corresponding
+                    button</p>
+                </li>
+                <li><p>In the reports tab, you can download reports for those files where tests were carried out at
+                    least
+                    once</p>
+                </li>
+            </ol>
+        </main>
+    </div>
+</div>
+</body>
+</html>

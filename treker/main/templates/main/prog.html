@@ -14,7 +14,7 @@
     <div class="row">
         {% include "./patern.html" %}
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
-            <h2>{{title}}.py  version- {{version}}</h2>
+            <h2>{{title}}.py version- {{version}}</h2>
 
             <span class="align-middle">
                 <h3>status:
@@ -51,19 +51,27 @@
                     </tr>
                     </thead>
                     <tbody>
+                    {% for dat in dataset %}
                     <tr>
-                        <td>1,001</td>
-                        <td>version</td>
-                        <td>time</td>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{dat.version}}</td>
+                        <td>{{dat.time}}</td>
                         <td>
-                            <a class="btn btn-warning btn-sm" href="/syntax/" role="button">{{s_count}} Errors -
+                            <a class="btn btn-warning btn-sm" href="/syntax/{{title}}/{{dat.time}}" role="button">{{dat.count}} Errors -
                                 view</a>
                         </td>
-                        <td>rate</td>
+                        <td>{{dat.score}}</td>
+                        {% if dat.r_err_text|length %}
                         <td>
-                            <a class="btn btn-danger btn-sm" href="#" role="button">Errors - view</a>
+                            <a class="btn btn-danger btn-sm" href="/runtime/{{title}}/{{dat.time}}" role="button">Errors - view</a>
                         </td>
+                        {% else %}
+                        <td>
+                            <a class="btn btn-info btn-sm" href="/runtime/{{title}}/{{dat.time}}" role="button">Execution result - view</a>
+                        </td>
+                        {% endif %}
                     </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>

@@ -8,7 +8,7 @@ from django.core.files import File
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.http import FileResponse
-from .models import Progs
+from .models import Progs, Syntax, Runtime
 from django.db import connection
 
 
@@ -32,35 +32,73 @@ def index(request):
     return render(request, 'main/index.html', context)
 
 
-def syntax(request):
-    pass
+def syntax(request, p_name, time):
+    cur_prg = Progs.objects.get(filename=p_name)
+    p_id = cur_prg.id
+    synt = Syntax.objects.get(prog_id=p_id, time=time)
+    dataset = synt.get_dict()
+    dataset['name'] = p_name
+    dataset['time'] = time
+    dataset['version'] = synt.version
+    context = {'prg_names': valids_progs(),
+               'title': p_name,
+               'dat': dataset
+               }
+    return render(request, 'main/syntax.html', context)
 
 
-def runtime(request):
-    pass
+def runtime(request, p_name, time):
+    cur_prg = Progs.objects.get(filename=p_name)
+    p_id = cur_prg.id
+    run = Runtime.objects.get(prog_id=p_id, time=time)
+    dataset = run.get_dict()
+    dataset['name'] = p_name
+    dataset['time'] = time
+    dataset['version'] = run.version
+    context = {'prg_names': valids_progs(),
+               'title': p_name,
+               'dat': dataset
+               }
+    return render(request, 'main/runtime.html', context)
 
 
 @csrf_exempt
 def prog(request, prg_name):
     if request.method == 'POST':
         cur_prg = Progs.objects.get(filename=prg_name)
-
         t = Tester(prg_name + '.py', cur_prg.get_version(), cur_prg.id)
         t.syntax_test()
         t.runtime_test()
-        print(t.report_items)
+        if t.report_items['runtime_errors'] != '':
+            cur_prg.status = 'runtime_errors'
+        elif t.report_items['runtime_errors'] == '' and int(t.report_items['syntax_count']) >= 2:
+            cur_prg.status = 'syntax_errors'
+        else:
+            cur_prg.status = 'passed'
+        cur_prg.save()
         del t
         return HttpResponseRedirect(f'''/prog/{prg_name.replace('.py', '')}''')
     else:
         cur_prg = Progs.objects.get(filename=prg_name)
+        p_id = cur_prg.id
         status = cur_prg.get_status()
         version = cur_prg.get_version()
-        color_dict = {'not_runned': 'darkgray', 'some_errors': 'yellow', 'passed': 'green'}
+        color_dict = {'not_runned': 'darkgray', 'syntax_errors': 'yellow', 'passed': 'green', 'runtime_errors': 'red'}
+        synt = Syntax.objects.filter(prog_id=p_id)
+        dataset = []
+        for s in synt:
+            up_data = s.get_dict()
+            r = Runtime.objects.get(time=s.time)
+            for key, value in r.get_dict().items():
+                up_data[key] = value
+            up_data['time'] = s.time
+            dataset.append(up_data)
         context = {'prg_names': valids_progs(),
                    'title': prg_name,
                    'status': status.replace('_', ' '),
                    'status_colour': color_dict[status],
-                   'version':version
+                   'version': version,
+                   'dataset': dataset
                    }
         return render(request, 'main/prog.html', context)
 
@@ -123,3 +161,9 @@ def file_send(request, p_name):
     img = open(os.path.join(os.getcwd(), 'main', 'user_files', p_name, 'Report_' + p_name + '.xlsx'), 'rb')
     response = FileResponse(img)
     return response
+
+
+def how_use(request):
+    context = {'prg_names': valids_progs(),
+               }
+    return render(request, 'main/how_use.html', context)
