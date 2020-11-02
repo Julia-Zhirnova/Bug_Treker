@@ -1,4 +1,5 @@
 import os
+import shutil
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from .testing_worker import Tester
@@ -167,3 +168,14 @@ def how_use(request):
     context = {'prg_names': valids_progs(),
                }
     return render(request, 'main/how_use.html', context)
+
+
+def delite(request, p_name):
+    cur_prg = Progs.objects.get(filename=p_name)
+    shutil.rmtree(os.path.join(os.getcwd(), 'main', 'user_files',p_name), ignore_errors=True)
+    for ob in Syntax.objects.filter(prog_id=cur_prg.id):
+        ob.delete()
+    for ob in Runtime.objects.filter(prog_id=cur_prg.id):
+        ob.delete()
+    cur_prg.delete()
+    return HttpResponseRedirect('/')

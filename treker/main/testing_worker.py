@@ -86,6 +86,7 @@ class Tester(object):
                     up_tarace.append(tr.replace('  ', ''))
             up_tarace[3] = up_tarace[3].replace('""', self.file)
             self.report_items['runtime_errors'] = '\n'.join(up_tarace[3:])
+            self.report_items['run_result'] = ''
         else:
             trace = result.stdout
             self.report_items['run_result'] = trace
